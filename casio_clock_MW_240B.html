@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casio Style Clock</title>
+<style>
+  :root{
+    --case: #161616;
+    --case-hi: #3d3d3d;
+    --dial: #f2ecc6;
+    --dial-hi: #faf6dc;
+    --dial-shadow: #e2d9a6;
+    --ink: #14120d;
+    --red: #b2431e;
+    --strap-olive: #7a7a56;
+    --strap-olive-dark: #5f5f42;
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:radial-gradient(circle at 50% 30%, #2c2c2c 0%, #0a0a0a 75%);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow:hidden;
+  }
+  .stage{
+    position:relative;
+    width:min(88vw,440px);
+    aspect-ratio:1/1;
+  }
+
+  /* ===== Strap ===== */
+  .strap{
+    position:absolute;
+    left:50%;
+    width:46%;
+    height:34%;
+    background:linear-gradient(90deg, var(--strap-olive-dark), var(--strap-olive) 15%, var(--strap-olive) 85%, var(--strap-olive-dark));
+    transform:translateX(-50%);
+    z-index:0;
+  }
+  .strap::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0 3px, transparent 3px 13px);
+  }
+  .strap.top{ top:-14%; border-radius:4px 4px 0 0; }
+  .strap.bottom{ bottom:-14%; border-radius:0 0 4px 4px; }
+
+  .strap-buckle{
+    position:absolute;
+    left:50%;
+    width:58%;
+    height:15%;
+    background:linear-gradient(180deg,#1c1c1c,#050505);
+    border-radius:2px;
+    transform:translateX(-50%);
+    z-index:1;
+    box-shadow: inset 0 0 0 1px #000, 0 3px 5px rgba(0,0,0,.6);
+  }
+  .strap-buckle::after{
+    content:"";
+    position:absolute;
+    inset:12% 6%;
+    border:1.5px solid rgba(255,255,255,.06);
+    border-radius:1px;
+  }
+  .strap-buckle.top{ top:-4.5%; }
+  .strap-buckle.bottom{ bottom:-4.5%; }
+
+  .lug-pin{
+    position:absolute;
+    top:50%;
+    width:5%;
+    height:5%;
+    background:linear-gradient(135deg,#d8b56a,#8a6a2e);
+    border-radius:50%;
+    transform:translateY(-50%);
+    z-index:3;
+    box-shadow:0 0 0 1px #3a2c10;
+  }
+  .lug-pin.left{ left:6%; }
+  .lug-pin.right{ right:6%; }
+
+  /* ===== Case ===== */
+  .case{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 28%, var(--case-hi), var(--case) 62%);
+    box-shadow:
+      0 12px 34px rgba(0,0,0,.65),
+      inset 0 0 0 2px #000,
+      inset 0 2px 3px rgba(255,255,255,.06);
+    z-index:2;
+  }
+  .crown{
+    position:absolute;
+    right:-4.5%;
+    top:47%;
+    width:8%;
+    height:9%;
+    background:linear-gradient(180deg,#555,#0c0c0c);
+    border-radius:2px 4px 4px 2px;
+    z-index:1;
+    box-shadow: 0 0 0 1px #000;
+  }
+  .crown::after{
+    content:"";
+    position:absolute;
+    inset:25% 15%;
+    background:repeating-linear-gradient(180deg, rgba(255,255,255,.15) 0 1px, transparent 1px 2.5px);
+  }
+  .bezel{
+    position:absolute;
+    inset:5.5%;
+    border-radius:50%;
+    background: var(--case);
+    box-shadow: inset 0 0 0 2px #000, inset 0 3px 8px rgba(0,0,0,.8), inset 0 -2px 4px rgba(255,255,255,.04);
+  }
+
+  /* ===== Dial ===== */
+  .dial{
+    position:absolute;
+    inset:5%;
+    border-radius:50%;
+    background: radial-gradient(circle at 40% 32%, var(--dial-hi), var(--dial) 5%, var(--dial-shadow) 100%);
+    box-shadow: inset 0 0 12px rgba(0,0,0,.28), inset 0 0 0 1px rgba(0,0,0,.15);
+    overflow:hidden;
+  }
+
+  .spoke{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:2px;
+    height:46%;
+    transform-origin:50% 0%;
+    margin-left:-1.25px;
+    background:linear-gradient(to bottom,
+      transparent 0%, transparent 86%,
+      var(--ink) 86%, var(--ink) 100%);
+  }
+  .spoke.hour{
+    width:10px;
+    margin-left:-3px;
+    background:linear-gradient(to bottom,
+      transparent 0%, transparent 82%,
+      var(--ink) 82%, var(--ink) 100%);
+  }
+
+  .num{
+    position:absolute;
+    left:50%;
+    top:50%;
+    font-weight:800;
+    color:var(--ink);
+    font-size:200%;
+    line-height:1;
+    transform:translate(-50%,-50%);
+    user-select:none;
+  }
+  .num24{
+    position:absolute;
+    left:50%;
+    top:50%;
+    font-weight:700;
+    color:var(--red);
+    font-size:100%;
+    line-height:1;
+    transform:translate(-50%,-50%);
+    user-select:none;
+  }
+
+  .brand{
+    position:absolute;
+    left:50%;
+    top:36%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .brand .name{
+    font-size:clamp(13px,4.4vw,20px);
+    font-weight:800;
+    letter-spacing:0.5px;
+  }
+  .brand .sub{
+    font-size:clamp(7px,2.1vw,9.5px);
+    letter-spacing:2.5px;
+    font-weight:700;
+    margin-top:1px;
+  }
+
+  .wr{
+    position:absolute;
+    left:50%;
+    top:64%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .wr .t1{ font-size:clamp(5px,2.6vw, 10px); font-weight:800; }
+  .wr .t2{
+    font-size:clamp(8px,2.3vw,10px);
+    font-weight:800;
+    border:2px solid var(--ink);
+    border-radius:8px;
+    padding:0 5px;
+    display:inline-block;
+    margin-top:2px;
+  }
+
+  .movt{
+    position:absolute;
+    left:50%;
+    bottom:1%;
+    transform:translateX(-50%);
+    font-size:clamp(6px,1.7vw,7.5px);
+    color:var(--ink);
+    font-weight:600;
+    letter-spacing:.4px;
+    white-space:nowrap;
+  }
+
+  /* ===== Hands ===== */
+  .hand{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform-origin:50% 100%;
+    border-radius:1px;
+    filter: drop-shadow(0 0 0.6px var(--ink)) drop-shadow(0.6px 0 0 var(--ink)) drop-shadow(-0.6px 0 0 var(--ink));
+    z-index:4;
+  }
+  .hour-hand{
+    width:6%;
+    height:25%;
+    background:#888785;
+    margin-left:-3%;
+    margin-top:-25%;
+    clip-path: polygon(50% 0%, 100% 22%, 100% 100%, 0% 100%, 0% 22%);
+  }
+  .hour-hand::after, .minute-hand::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:20%;
+    bottom:4%;
+    width:1.5px;
+    background:var(--ink);
+    transform:translateX(-50%);
+  }
+  .minute-hand{
+    width:4.6%;
+    height:38%;
+    background:#abaaa7;
+    margin-left:-2.3%;
+    margin-top:-38%;
+    clip-path: polygon(50% 0%, 100% 15%, 100% 100%, 0% 100%, 0% 15%);
+  }
+  .second-hand{
+    width:0.8%;
+    height:40%;
+    background:var(--red);
+    margin-left:-0.4%;
+    margin-top:-40%;
+    filter:none;
+    z-index:5;
+  }
+  .second-hand::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-12%;
+    width:1000%;
+    height:12%;
+    background:var(--red);
+    transform:translateX(-50%);
+  }
+  .pin{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:3%;
+    height:3%;
+    background:radial-gradient(circle,#4a4a4a,#000);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    z-index:6;
+    box-shadow:0 0 0 1px #000;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="strap top"></div>
+  <div class="strap bottom"></div>
+  <div class="strap-buckle top"></div>
+  <div class="strap-buckle bottom"></div>
+
+  <div class="case">
+    <div class="lug-pin left"></div>
+    <div class="lug-pin right"></div>
+    <div class="crown"></div>
+    <div class="bezel"></div>
+    <div class="dial" id="dial">
+      <div class="brand">
+        <div class="name">CASIO</div>
+        <div class="sub">QUARTZ</div>
+      </div>
+      <div class="wr">
+        <div class="t1">WR50M</div>
+        <div class="t2">WR</div>
+      </div>
+      <div class="movt">JAPAN &middot; MOV'T</div>
+
+      <div class="hand hour-hand" id="hourHand"></div>
+      <div class="hand minute-hand" id="minuteHand"></div>
+      <div class="hand second-hand" id="secondHand"></div>
+      <div class="pin"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dial = document.getElementById('dial');
+
+  // 60 minute/hour tick spokes (radiate from center, only outer segment visible via gradient)
+  for (let i = 0; i < 60; i++) {
+    const angle = i * 6;
+    const spoke = document.createElement('div');
+    spoke.className = 'spoke' + (i % 5 === 0 ? ' hour' : '');
+    spoke.style.transform = 'rotate(' + angle + 'deg)';
+    dial.insertBefore(spoke, dial.firstChild);
+  }
+
+  // 12 black hour numerals (outer ring)
+  for (let i = 1; i <= 12; i++) {
+    const angle = i * 30;
+    const rad = (angle - 90) * Math.PI / 180;
+    const r = 31;
+    const x = 50 + r * Math.cos(rad);
+    const y = 50 + r * Math.sin(rad);
+    const num = document.createElement('div');
+    num.className = 'num';
+    num.textContent = i;
+    num.style.left = x + '%';
+    num.style.top = y + '%';
+    dial.appendChild(num);
+  }
+
+  // 12 red 24-hour numerals (inner ring) - same angle as matching hour number
+  for (let i = 1; i <= 12; i++) {
+    const val = i + 12; // i=12 -> 24, sits at 12 o'clock
+    const angle = i * 30;
+    const rad = (angle - 90) * Math.PI / 180;
+    const r = 21.5;
+    const x = 50 + r * Math.cos(rad);
+    const y = 50 + r * Math.sin(rad);
+    const num = document.createElement('div');
+    num.className = 'num24';
+    num.textContent = val;
+    num.style.left = x + '%';
+    num.style.top = y + '%';
+    dial.appendChild(num);
+  }
+
+  const hourHand = document.getElementById('hourHand');
+  const minuteHand = document.getElementById('minuteHand');
+  const secondHand = document.getElementById('secondHand');
+
+  function tick() {
+    const now = new Date();
+    const h = now.getHours() % 12;
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    const ms = now.getMilliseconds();
+
+    const secDeg = (s + ms / 1000) * 6;
+    const minDeg = (m + s / 60) * 6;
+    const hourDeg = (h + m / 60) * 30;
+
+    hourHand.style.transform = `rotate(${hourDeg}deg)`;
+    minuteHand.style.transform = `rotate(${minDeg}deg)`;
+    secondHand.style.transform = `rotate(${secDeg}deg)`;
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
